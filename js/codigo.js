@@ -1,20 +1,28 @@
 'use strict';
 
-var d            = document,
+let d            = document,
     pantalla     = d.getElementById( "pantalla" ),
     teclas       = d.querySelectorAll( ".tecla span" ),
     ultOperacion = "",
     resultado    = 0,
     principio    = true,
-    calc         = true;
+    calc         = true,
+    operaciones  = [
+      "+",
+      "-",
+      "/",
+      "x",
+      "*",
+      "^",
+    ];
 
-function procesador( entrada ) {
+function procesador( entrada, keyCode = null ) {
 
-  var val = pantalla.textContent;
+  let val = pantalla.textContent;
 
-  if ( entrada == "." && val.indexOf( "." ) > -1 ) return;
+  if ( entrada === "." && val.indexOf( "." ) > -1 ) return;
 
-  if ( entrada == "<" ) {
+  if ( entrada === "<" || keyCode === 8 ) {
 
     if ( val.length > 1 ) {
       val = val.substring( 0, val.length - 1 );
@@ -29,7 +37,7 @@ function procesador( entrada ) {
 
   } else {
 
-    if ( entrada == "C" ) {
+    if ( entrada === "c" || keyCode === 27 ) {
 
       pantalla.textContent = "0";
       resultado = 0;
@@ -37,8 +45,6 @@ function procesador( entrada ) {
       calc = true;
 
     } else {
-
-//            console.log( val + entrada );
 
       if ( principio ) {
 
@@ -48,13 +54,7 @@ function procesador( entrada ) {
 
       }
 
-      if (
-        entrada == "+" ||
-        entrada == "-" ||
-        entrada == "/" ||
-        entrada == "X" ||
-        entrada == "^"
-      ) {
+      if ( operaciones.indexOf( entrada ) !== -1 ) {
 
         principio = true;
 
@@ -70,18 +70,19 @@ function procesador( entrada ) {
 
         }
 
-        ultOperacion = entrada;
+        ultOperacion = entrada.toLowerCase();
 
-      } else if ( entrada == "√" ) {
+      } else if ( entrada === "√" ) {
 
         pantalla.textContent = Math.sqrt( val );
+        calc = true;
+        principio = true;
 
       } else {
 
-        if ( entrada == "=" ) {
+        if ( entrada === "=" || keyCode === 13 ) {
 
           calculador( val );
-
           pantalla.textContent = resultado;
 
           calc = true;
@@ -97,11 +98,9 @@ function procesador( entrada ) {
 
       }
 
-
     }
 
   }
-
 
 }
 
@@ -120,7 +119,8 @@ function calculador( val ) {
       resultado -= val;
       break;
 
-    case "X":
+    case "x":
+    case "*":
       resultado *= val;
       break;
 
@@ -132,105 +132,40 @@ function calculador( val ) {
       resultado **= val;
       break;
 
-    case entrada == "√":
-      resultado **= val;
+    case "√":
+      resultado = Math.sqrt( val );
       break;
 
   }
 
 }
 
-window.addEventListener( "keyup", function ( e ) {
+window.addEventListener( "keyup", handleKeyPress );
+
+function handleKeyPress( e ) {
 
   e.preventDefault();
 
-  var c = e.which || e.keyCode;
+  let keyCode = e.which || e.keyCode,
+      key     = e.key;
 
-  teclas.forEach( function ( e ) {
-
-    keyCodeClick( e, c );
-
-  } );
-
-} );
-
-function keyCodeClick( elem, keyCode ) {
-
-  var entrada = elem.textContent,
-      code    = 0;
-
-  if ( entrada == "" ) return;
-
-  switch ( entrada ) {
-
-    case "C":
-      code = 27;
-      break;
-    case "<":
-      code = 8;
-      break;
-    case "X":
-      code = 106;
-      break;
-    case "+":
-      code = 107;
-      break;
-    case "/":
-      code = 111;
-      break;
-    case "=":
-      code = 13;
-      break;
-    case "-":
-      code = 109;
-      break;
-    case ".":
-      code = 110;
-      break;
-    default:
-      code = entrada.charCodeAt( 0 );
-      break;
-
-  }
-
-  if ( isNumKeyPad( code ) ) {
-
-    var numPad = convertToNumPadKey( code );
-
-    if ( keyCode == numPad ) {
-      elem.click();
-    }
-
-  }
-
-  if ( keyCode == code ) {
-    elem.click();
-    return;
-  }
-
+  if (
+    key.match( /([0-9]|Enter|Escape|Backspace)/ ) ||
+    operaciones.indexOf( key ) !== -1
+  ) procesador( key, keyCode );
 
 }
 
-function isNumKeyPad( numKey ) {
-
-  if ( numKey >= 48 && numKey <= 57 ) return true;
-  return false;
-
-}
-
-function convertToNumPadKey( numKey ) {
-
-  return numKey + 48;
-
-}
+let isNumKeyPad        = numKey => numKey >= 48 && numKey <= 57,
+    convertToNumPadKey = numKey => numKey + 48;
 
 teclas.forEach( function ( e ) {
 
   e.addEventListener( "click", function () {
 
-    var entrada = this.textContent;
+    let entrada = this.textContent.toLowerCase();
 
-    if ( entrada != "" ) {
+    if ( entrada !== "" ) {
 
       procesador( entrada );
 
@@ -239,12 +174,3 @@ teclas.forEach( function ( e ) {
   } );
 
 } );
-
-
-
-
-
-
-
-
-
