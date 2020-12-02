@@ -73,13 +73,9 @@ function procesador( entrada ) {
                 ultOperacion = entrada;
                 
             } else if( entrada == "√" ) {
-                
-                
-                
-            } else if( entrada == "^" ) {
 
-                console.log( entrada );
-
+                pantalla.textContent = Math.sqrt( val );
+                
             } else {
                 
                 if( entrada == "=" ) {
