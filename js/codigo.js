@@ -52,7 +52,8 @@ function procesador( entrada ) {
                 entrada == "+" ||
                 entrada == "-" ||
                 entrada == "/" ||
-                entrada == "X" 
+                entrada == "X" ||
+                entrada == "^"
             ) {
                 
                 principio = true;
@@ -71,10 +72,14 @@ function procesador( entrada ) {
                 
                 ultOperacion = entrada;
                 
-            } else if( entrada == "raiz" ) {
+            } else if( entrada == "√" ) {
                 
                 
                 
+            } else if( entrada == "^" ) {
+
+                console.log( entrada );
+
             } else {
                 
                 if( entrada == "=" ) {
@@ -126,7 +131,15 @@ function calculador( val ) {
         case "/":
             resultado /= val;
             break;
-        
+
+        case "^":
+            resultado **= val;
+            break;
+
+        case entrada == "√":
+            resultado **= val;
+            break;
+
     }
     
 }
